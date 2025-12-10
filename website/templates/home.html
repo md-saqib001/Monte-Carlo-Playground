@@ -1,0 +1,77 @@
+{% extends "base.html" %} 
+{% block title %}Home{% endblock %} 
+
+{% block content %}
+<h1 align="center">Monte Carlo Playground</h1>
+<br>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card card-body">
+            <form method="POST">
+                <h5>Simulation Parameters</h5>
+                <div class="form-group">
+                    <label>Asset Price ($)</label>
+                    <input type="number" name="price" class="form-control" value="100" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Volatility (sigma)</label>
+                    <input type="number" name="volatility" class="form-control" value="0.2" step="0.01" required>
+                    <small class="text-muted">e.g. 0.2 for 20%</small>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Run Simulation</button>
+            </form>
+        </div>
+        
+        {% if show_result %}
+        <br>
+        <div class="alert alert-success text-center">
+            <h4>Average Price</h4>
+            <h2>${{ avg_price }}</h2>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-8">
+        {% if show_result %}
+            <img src="data:image/png;base64,{{ image }}" class="img-fluid" alt="Simulation Graph">
+        {% else %}
+            <div class="jumbotron text-center">
+                <h3>Ready to Simulate</h3>
+                <p>Enter parameters on the left to see the future.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3 align="center">Simulation History</h3>
+        
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Inputs (Price / Vol)</th>
+                    <th scope="col">Predicted Average ($)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sim in user.simulations|reverse %}
+                <tr>
+                    <td>{{ sim.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    
+                    <td>${{ sim.asset_price }} / {{ sim.volatility }}</td>
+                    
+                    <td>
+                        <strong>${{ "%.2f"|format(sim.average_price) }}</strong>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
